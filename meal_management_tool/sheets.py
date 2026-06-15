@@ -9,29 +9,17 @@ Google Sheets 連携モジュール
   | 2024-01-15 | 夜       | 白米、唐揚げ | タンパク質... | 練習後 | 2024-01-15 20:30:00 |
 
 前提：
-  - プロジェクトルートに credentials.json が必要です
-  - .env に GOOGLE_SPREADSHEET_ID を設定してください
+  - 環境変数 GOOGLE_SERVICE_ACCOUNT_JSON にサービスアカウントのJSONを設定してください
+  - 環境変数 GOOGLE_SPREADSHEET_ID にスプレッドシートIDを設定してください
 """
 
 import os
-import ssl
-import urllib3
-import requests
+import json
 from datetime import datetime, timedelta
+
 import gspread
 from google.oauth2.service_account import Credentials
 from dotenv import load_dotenv
-
-# McAfee などが SSL 証明書を書き換える環境向けの対応（ローカル開発環境用）
-ssl._create_default_https_context = ssl._create_unverified_context
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-# requests ライブラリのデフォルト SSL 検証を無効化
-_original_request = requests.Session.request
-def _patched_request(self, *args, **kwargs):
-    kwargs.setdefault('verify', False)
-    return _original_request(self, *args, **kwargs)
-requests.Session.request = _patched_request
 
 load_dotenv()
 
@@ -51,31 +39,37 @@ WORKSHEET_NAME = '食事記録'
 def _get_worksheet():
     """
     Google Sheets のワークシートオブジェクトを取得する内部関数。
+    環境変数 GOOGLE_SERVICE_ACCOUNT_JSON からサービスアカウント認証情報を読み込みます。
     ワークシートが存在しない場合は自動作成し、ヘッダーを追加します。
 
     Returns:
         gspread.Worksheet: ワークシートオブジェクト
 
     Raises:
-        FileNotFoundError: credentials.json が見つからない場合
-        Exception: スプレッドシートIDが無効な場合など
+        ValueError: 環境変数が未設定またはJSONが不正な場合
     """
-    # credentials.json が存在するか確認
-    if not os.path.exists('credentials.json'):
-        raise FileNotFoundError(
-            "credentials.json が見つかりません。\n"
-            "README.md の「Google Cloud の設定」を参照して配置してください。"
+    # 環境変数からサービスアカウントのJSON文字列を取得
+    service_account_json = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
+    if not service_account_json:
+        raise ValueError(
+            "GOOGLE_SERVICE_ACCOUNT_JSON が環境変数に設定されていません。\n"
+            "Render の Environment Variables に credentials.json の内容を貼り付けてください。"
         )
 
-    # サービスアカウントの認証情報を読み込む
-    creds = Credentials.from_service_account_file('credentials.json', scopes=SCOPES)
+    try:
+        service_account_info = json.loads(service_account_json)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"GOOGLE_SERVICE_ACCOUNT_JSON の JSON 形式が正しくありません: {e}")
+
+    # サービスアカウントの認証情報を生成
+    creds = Credentials.from_service_account_info(service_account_info, scopes=SCOPES)
     client = gspread.authorize(creds)
 
     # .env から スプレッドシートID を取得
     spreadsheet_id = os.getenv('GOOGLE_SPREADSHEET_ID')
     if not spreadsheet_id:
         raise ValueError(
-            "GOOGLE_SPREADSHEET_ID が .env に設定されていません。\n"
+            "GOOGLE_SPREADSHEET_ID が環境変数に設定されていません。\n"
             ".env.example を参考に設定してください。"
         )
 
@@ -110,13 +104,9 @@ def save_meal_record(date_str: str, meal_type: str, menu: str, comment: str, mem
     """
     worksheet = _get_worksheet()
 
-    # 現在時刻を文字列で取得
     recorded_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-    # 1行分のデータをリストで作成
     row_data = [date_str, meal_type, menu, comment, memo, recorded_at]
 
-    # スプレッドシートの末尾に1行追加
     worksheet.append_row(row_data, value_input_option='USER_ENTERED')
     print(f"✅ Google Sheets に保存: {date_str} [{meal_type}]")
 
@@ -127,15 +117,10 @@ def get_today_records() -> list:
 
     Returns:
         list[dict]: 今日の記録リスト。
-                    各要素は {'日付': ..., '食事区分': ..., ...} の辞書。
     """
     worksheet = _get_worksheet()
     today = datetime.now().strftime('%Y-%m-%d')
-
-    # スプレッドシートの全行を辞書のリストとして取得
     all_records = worksheet.get_all_records()
-
-    # 今日の日付に一致する行だけを抽出
     return [r for r in all_records if r.get('日付') == today]
 
 
@@ -148,13 +133,10 @@ def get_week_records() -> list:
     """
     worksheet = _get_worksheet()
 
-    # 7日前〜今日の日付範囲を計算
     today = datetime.now().strftime('%Y-%m-%d')
     week_ago = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
 
     all_records = worksheet.get_all_records()
-
-    # 日付でフィルタリング（文字列比較で大小比較できる YYYY-MM-DD 形式）
     return [
         r for r in all_records
         if week_ago <= r.get('日付', '') <= today

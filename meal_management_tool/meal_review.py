@@ -13,17 +13,13 @@ OpenAI API を使って日次・週次の振り返りレポートを生成しま
 """
 
 import os
-import httpx
 from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# McAfee などのセキュリティソフトが SSL 証明書を書き換える環境向けの対応
-_http_client = httpx.Client(verify=False)
-
-# OpenAI クライアントを初期化
-client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'), http_client=_http_client)
+# OpenAI クライアントを初期化（APIキーは環境変数から読み込む）
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 
 def create_daily_review(records: list) -> str:

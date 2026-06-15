@@ -11,21 +11,13 @@ OpenAI の GPT-4o（画像認識対応モデル）を使って、
 
 import os
 import base64
-import httpx
 from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# McAfee などのセキュリティソフトが SSL 証明書を書き換える環境向けの対応
-# SSL 検証を無効化した httpx クライアントを使用する（ローカル開発環境用）
-_http_client = httpx.Client(verify=False)
-
-# OpenAI クライアントを初期化（APIキーは .env から読み込む）
-client = OpenAI(
-    api_key=os.getenv('OPENAI_API_KEY'),
-    http_client=_http_client
-)
+# OpenAI クライアントを初期化（APIキーは環境変数から読み込む）
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 
 def analyze_meal_image(image_bytes: bytes) -> tuple:

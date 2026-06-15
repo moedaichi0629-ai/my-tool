@@ -7,6 +7,9 @@ openai>=1.0.0
 # Flask（Webhook サーバー）
 flask>=3.0.0
 
+# Gunicorn（本番用WSGIサーバー - Renderで使用）
+gunicorn>=21.0.0
+
 # Google Sheets API
 gspread>=6.0.0
 google-auth>=2.0.0

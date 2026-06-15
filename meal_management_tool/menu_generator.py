@@ -7,18 +7,14 @@
 """
 
 import os
-import httpx
 from datetime import datetime, timedelta
 from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# McAfee などのセキュリティソフトが SSL 証明書を書き換える環境向けの対応
-_http_client = httpx.Client(verify=False)
-
-# OpenAI クライアントを初期化
-client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'), http_client=_http_client)
+# OpenAI クライアントを初期化（APIキーは環境変数から読み込む）
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 
 def generate_weekly_menu(records: list) -> str:

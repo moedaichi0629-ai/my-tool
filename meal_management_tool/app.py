@@ -17,6 +17,7 @@ LINE食事記録ツール - メインアプリケーション
 """
 
 import os
+import logging
 import threading
 from datetime import datetime
 
@@ -46,8 +47,15 @@ from sheets import save_meal_record, get_today_records, get_week_records
 from meal_review import create_daily_review, create_weekly_review
 from menu_generator import generate_weekly_menu
 
-# .env ファイルから環境変数を読み込む
+# .env ファイルから環境変数を読み込む（Renderでは環境変数が直接設定される）
 load_dotenv()
+
+# ロガーを設定（Renderのログに出力される）
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 # Flask アプリを初期化
 app = Flask(__name__)
@@ -133,6 +141,19 @@ def download_image(message_id: str) -> bytes:
 
 
 # ─────────────────────────────────────────────
+# ヘルスチェックエンドポイント
+# ─────────────────────────────────────────────
+
+@app.route('/', methods=['GET'])
+def health_check():
+    """
+    Render のヘルスチェックおよびブラウザ確認用エンドポイント。
+    デプロイ後にこのURLにアクセスして動作確認ができます。
+    """
+    return 'LINE食事記録Bot は正常に動作しています ✅', 200
+
+
+# ─────────────────────────────────────────────
 # Webhook エンドポイント
 # ─────────────────────────────────────────────
 
@@ -150,10 +171,12 @@ def callback():
     try:
         handler.handle(body, signature)
     except InvalidSignatureError:
-        # 署名が一致しない場合は不正なリクエストとして 400 を返す
+        logger.warning("Invalid signature: 不正なWebhookリクエストを受信しました")
         abort(400)
+    except Exception as e:
+        # 予期しないエラーが起きてもLINEへは200を返す（再送ループを防ぐ）
+        logger.error(f"Webhook処理中にエラーが発生しました: {e}", exc_info=True)
 
-    # LINE サーバーには必ず 200 OK を返す（返さないと再送が繰り返される）
     return 'OK'
 
 
@@ -298,17 +321,14 @@ def _run_meal_analysis(user_id: str, image_id: str, meal_type: str, memo: str) -
     threading.Thread のターゲットとして呼ばれる。
     """
     try:
-        # 1. LINE から画像を取得
-        image_bytes = download_image(image_id)
+        logger.info(f"食事解析開始: user={user_id}, type={meal_type}")
 
-        # 2. OpenAI Vision で食事内容を解析
+        image_bytes = download_image(image_id)
         menu, comment = analyze_meal_image(image_bytes)
 
-        # 3. Google Sheets に保存
         today = datetime.now().strftime('%Y-%m-%d')
         save_meal_record(today, meal_type, menu, comment, memo)
 
-        # 4. 解析結果を LINE にプッシュ送信
         result_message = (
             "✅ 食事記録が完了しました！\n\n"
             f"🍽️ 推定メニュー：\n{menu}\n\n"
@@ -320,9 +340,10 @@ def _run_meal_analysis(user_id: str, image_id: str, meal_type: str, memo: str) -
             "Googleスプレッドシートに保存しました📋"
         )
         push_text(user_id, result_message)
+        logger.info(f"食事解析完了: user={user_id}")
 
     except Exception as e:
-        # エラーが発生した場合もユーザーに通知する
+        logger.error(f"食事解析エラー: user={user_id}, error={e}", exc_info=True)
         push_text(user_id, f"❌ エラーが発生しました。\n{str(e)}\n\nしばらくしてから再度お試しください。")
 
 
@@ -367,10 +388,10 @@ def _run_menu_generation(user_id: str) -> None:
 # ─────────────────────────────────────────────
 
 if __name__ == '__main__':
-    print("=" * 50)
-    print("LINE 食事記録ツール を起動します")
-    print("ポート: 5000")
-    print("ngrok で公開してから LINE の Webhook URL を設定してください")
-    print("=" * 50)
-    # debug=True にすると変更を自動で再読み込みするが、本番では False にする
-    app.run(port=5000, debug=True)
+    # Render は PORT 環境変数でポートを指定する（ローカルはデフォルト5000）
+    port = int(os.getenv('PORT', 5000))
+    logger.info("=" * 50)
+    logger.info("LINE 食事記録ツール を起動します")
+    logger.info(f"ポート: {port}")
+    logger.info("=" * 50)
+    app.run(host='0.0.0.0', port=port, debug=False)
