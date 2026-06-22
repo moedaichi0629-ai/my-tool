@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>日程調整支援ツール</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic UI", sans-serif;
+      color: #333;
+      background: #fff;
+      line-height: 1.6;
+    }
+
+    /* ヒーロー */
+    .hero {
+      background: linear-gradient(135deg, #4285F4 0%, #1a5cc4 100%);
+      color: white;
+      text-align: center;
+      padding: 80px 24px 64px;
+    }
+    .hero-icon { font-size: 3.5rem; margin-bottom: 16px; }
+    .hero h1 { font-size: 2rem; font-weight: 700; margin-bottom: 12px; }
+    .hero p  { font-size: 1.05rem; opacity: 0.9; max-width: 480px; margin: 0 auto 32px; }
+
+    .btn {
+      display: inline-block;
+      background: #fff;
+      color: #4285F4;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 14px 36px;
+      border-radius: 50px;
+      text-decoration: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+
+    .note {
+      font-size: 0.78rem;
+      opacity: 0.75;
+      margin-top: 14px;
+    }
+
+    /* 特徴 */
+    .features {
+      padding: 64px 24px;
+      background: #f8f9fa;
+      text-align: center;
+    }
+    .features h2 { font-size: 1.4rem; margin-bottom: 40px; color: #222; }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .feature-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 28px 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .feature-card .icon { font-size: 2rem; margin-bottom: 12px; }
+    .feature-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .feature-card p  { font-size: 0.88rem; color: #666; }
+
+    /* 使い方 */
+    .steps {
+      padding: 64px 24px;
+      text-align: center;
+    }
+    .steps h2 { font-size: 1.4rem; margin-bottom: 40px; color: #222; }
+
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 560px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .step-num {
+      background: #4285F4;
+      color: white;
+      font-weight: 700;
+      font-size: 0.9rem;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .step-text h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 2px; }
+    .step-text p  { font-size: 0.85rem; color: #666; }
+
+    /* CTA */
+    .cta {
+      background: #4285F4;
+      color: white;
+      text-align: center;
+      padding: 64px 24px;
+    }
+    .cta h2 { font-size: 1.4rem; margin-bottom: 12px; }
+    .cta p  { font-size: 0.95rem; opacity: 0.85; margin-bottom: 28px; }
+    .btn-white {
+      display: inline-block;
+      background: #fff;
+      color: #4285F4;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 14px 36px;
+      border-radius: 50px;
+      text-decoration: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      transition: transform 0.15s;
+    }
+    .btn-white:hover { transform: translateY(-2px); }
+    .cta .note { opacity: 0.7; margin-top: 14px; font-size: 0.78rem; }
+
+    /* フッター */
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 0.8rem;
+      color: #999;
+      border-top: 1px solid #eee;
+    }
+
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 1.5rem; }
+      .hero p  { font-size: 0.95rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ヒーロー -->
+  <section class="hero">
+    <div class="hero-icon">📅</div>
+    <h1>日程調整支援ツール</h1>
+    <p>Googleカレンダーと連携して、空き時間の候補日とLINE・メール用の文章を自動で作成します。</p>
+    <a class="btn" href="https://my-tool-xpv5memhwjfqnsupvuudfk.streamlit.app" target="_blank">
+      無料で使ってみる
+    </a>
+    <p class="note">Googleアカウントでログインするだけ。無料で利用できます。</p>
+  </section>
+
+  <!-- 特徴 -->
+  <section class="features">
+    <h2>こんなことができます</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="icon">🔍</div>
+        <h3>空き時間を自動で検索</h3>
+        <p>Googleカレンダーの予定を確認し、指定した期間・時間帯の空きを自動で見つけます。</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">📋</div>
+        <h3>候補日を最大5件提案</h3>
+        <p>ダブルブッキングを防ぎながら、打ち合わせ候補日を最大5件リストアップします。</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">✉️</div>
+        <h3>LINE・メール文章を自動生成</h3>
+        <p>候補日をもとに、LINEとメール用の文章を短め・丁寧の4パターンで作成します。</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">📆</div>
+        <h3>カレンダーに直接登録</h3>
+        <p>日程が確定したら、アプリからGoogleカレンダーに予定を直接追加できます。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 使い方 -->
+  <section class="steps">
+    <h2>使い方はかんたん4ステップ</h2>
+    <div class="step-list">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">
+          <h4>Googleアカウントでログイン</h4>
+          <p>カレンダーの読み取り権限を許可するだけで使えます。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">
+          <h4>期間・時間帯・打ち合わせ時間を入力</h4>
+          <p>「来週」「平日の夜18〜22時」「60分」のように指定します。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">
+          <h4>候補日と送信文章が自動で完成</h4>
+          <p>空き時間を最大5件抽出し、LINE・メール用の文章を自動生成します。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-text">
+          <h4>確定したらカレンダーに登録</h4>
+          <p>日程が決まったらアプリから直接カレンダーに追加できます。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <h2>さっそく使ってみましょう</h2>
+    <p>無料・登録不要。Googleアカウントだけで始められます。</p>
+    <a class="btn-white" href="https://my-tool-xpv5memhwjfqnsupvuudfk.streamlit.app" target="_blank">
+      無料で使ってみる
+    </a>
+    <p class="note">※ 初回ログイン時に「このアプリはGoogleで確認されていません」と表示された場合は「詳細」→「アプリに移動」で進めてください。</p>
+  </section>
+
+  <footer>
+    <p>日程調整支援ツール &copy; 2026</p>
+  </footer>
+
+</body>
+</html>
