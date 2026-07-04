@@ -1,0 +1,264 @@
+.page {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  font-family: var(--font-geist-sans);
+  padding: 40px 16px 80px;
+}
+
+.main {
+  display: flex;
+  width: 100%;
+  max-width: 760px;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.main h1 {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.lead {
+  color: var(--text-secondary, #666);
+  line-height: 1.7;
+}
+
+.searchForm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--border-color, #e2e2e2);
+  border-radius: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.field input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #ccc);
+  font-size: 14px;
+  min-width: 200px;
+}
+
+.searchForm button {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  background: #111;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  height: 40px;
+}
+
+.searchForm button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #c0392b;
+  font-weight: 600;
+}
+
+.resultCount {
+  font-weight: 600;
+}
+
+.shopList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  list-style: none;
+}
+
+.shopCard {
+  border: 1px solid var(--border-color, #e2e2e2);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.shopCard h2 {
+  font-size: 20px;
+}
+
+.shopMeta {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  row-gap: 6px;
+  column-gap: 12px;
+  font-size: 14px;
+}
+
+.shopMeta dt {
+  font-weight: 600;
+  color: var(--text-secondary, #666);
+}
+
+.hoursList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.generateButton {
+  align-self: flex-start;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  background: #2d6cdf;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.generateButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.preLine {
+  white-space: pre-line;
+}
+
+.previewLabel {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary, #888);
+  text-transform: uppercase;
+}
+
+.sitePreview {
+  margin-top: 8px;
+  border: 1px solid var(--preview-border, #e2e2e2);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--preview-bg, #fff);
+  display: flex;
+  flex-direction: column;
+}
+
+.sitePreview .previewLabel {
+  padding: 10px 20px 0;
+}
+
+.heroSection {
+  padding: 28px 20px;
+  background: var(--hero-bg, #eef3fc);
+  text-align: center;
+}
+
+.heroCatch {
+  font-size: 22px;
+  line-height: 1.5;
+  font-weight: 700;
+  color: var(--hero-text, #1a2b4c);
+}
+
+.previewSection {
+  padding: 18px 20px;
+  border-top: 1px solid var(--preview-border, #e2e2e2);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.previewSection h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary, #888);
+  letter-spacing: 0.03em;
+}
+
+.previewList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: 18px;
+}
+
+.previewAddress {
+  color: var(--text-secondary, #666);
+  font-size: 14px;
+}
+
+.contactSection {
+  background: var(--contact-bg, #f7f8fa);
+  align-items: flex-start;
+}
+
+.telButton {
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: 8px;
+  background: #1a9e5c;
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.pitchButton {
+  align-self: flex-start;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #ccc);
+  background: transparent;
+  color: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pitchButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.pitchBox {
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--generated-bg, #f7f8fa);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .searchForm button {
+    background: #eee;
+    color: #111;
+  }
+
+  .pitchBox {
+    --generated-bg: #1a1a1a;
+  }
+
+  .sitePreview {
+    --preview-bg: #111;
+    --preview-border: #2a2a2a;
+  }
+
+  .heroSection {
+    --hero-bg: #1c2740;
+    --hero-text: #dce6ff;
+  }
+
+  .contactSection {
+    --contact-bg: #1a1a1a;
+  }
+}
