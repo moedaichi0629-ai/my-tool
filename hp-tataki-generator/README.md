@@ -106,7 +106,21 @@ OPENAI_MODEL=gpt-4o-mini
 
 ## スクリーンショット
 
-<!-- ここにアプリのスクリーンショット画像を貼り付けてください（例: ![検索画面](./docs/screenshot-search.png)） -->
+**検索フォーム**
+
+![検索フォーム](./docs/screenshots/01-search-form.png)
+
+**検索結果（店舗情報）**
+
+![検索結果](./docs/screenshots/02-shop-list.png)
+
+**HPたたき台プレビュー**
+
+![HPプレビュー](./docs/screenshots/03-hp-preview.png)
+
+**営業提案文（下書き）**
+
+![営業提案文](./docs/screenshots/04-sales-pitch.png)
 
 ## 注意事項・既知の制限
 
