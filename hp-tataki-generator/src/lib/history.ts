@@ -9,14 +9,35 @@ export interface SearchHistoryEntry {
   resultCount: number;
 }
 
-export interface GenerationHistoryEntry {
-  id: string;
-  placeId: string;
-  shopName: string;
-  region: string;
-  industry: string;
-  type: "site" | "pitch";
+export interface GeneratedSiteContent {
+  catchCopy: string;
+  introduction: string;
+  reasons: string;
+  services: string;
+  businessHours: string;
+  access: string;
+  contactCta: string;
 }
+
+export type GenerationHistoryEntry =
+  | {
+      id: string;
+      placeId: string;
+      shopName: string;
+      region: string;
+      industry: string;
+      type: "site";
+      site: GeneratedSiteContent;
+    }
+  | {
+      id: string;
+      placeId: string;
+      shopName: string;
+      region: string;
+      industry: string;
+      type: "pitch";
+      pitch: string;
+    };
 
 function readList<T>(key: string): T[] {
   if (typeof window === "undefined") return [];
@@ -74,16 +95,24 @@ export function addSearchHistory(
   return writeList(SEARCH_HISTORY_KEY, [newEntry, ...rest]);
 }
 
+function isValidGenerationEntry(entry: GenerationHistoryEntry): boolean {
+  if (entry.type === "site") return typeof entry.site === "object" && entry.site !== null;
+  if (entry.type === "pitch") return typeof entry.pitch === "string";
+  return false;
+}
+
 export function getGenerationHistory(): GenerationHistoryEntry[] {
-  const list = readList<GenerationHistoryEntry>(GENERATION_HISTORY_KEY);
-  const deduped = dedupeByKey(list, generationHistoryKey);
-  return deduped.length === list.length ? deduped : writeList(GENERATION_HISTORY_KEY, deduped);
+  const raw = readList<GenerationHistoryEntry>(GENERATION_HISTORY_KEY);
+  const deduped = dedupeByKey(raw.filter(isValidGenerationEntry), generationHistoryKey);
+  return deduped.length === raw.length ? deduped : writeList(GENERATION_HISTORY_KEY, deduped);
 }
 
 export function addGenerationHistory(
-  entry: Omit<GenerationHistoryEntry, "id">
+  entry:
+    | Omit<Extract<GenerationHistoryEntry, { type: "site" }>, "id">
+    | Omit<Extract<GenerationHistoryEntry, { type: "pitch" }>, "id">
 ): GenerationHistoryEntry[] {
-  const newEntry: GenerationHistoryEntry = { ...entry, id: createId() };
+  const newEntry = { ...entry, id: createId() } as GenerationHistoryEntry;
   const rest = getGenerationHistory().filter(
     (item) => generationHistoryKey(item) !== generationHistoryKey(entry)
   );

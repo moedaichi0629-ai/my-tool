@@ -44,6 +44,7 @@ export default function Home() {
   const [sheetSaves, setSheetSaves] = useState<Record<string, SheetSaveState>>({});
   const [searchHistory, setSearchHistory] = useState<SearchHistoryEntry[]>([]);
   const [generationHistory, setGenerationHistory] = useState<GenerationHistoryEntry[]>([]);
+  const [expandedHistoryId, setExpandedHistoryId] = useState<string | null>(null);
 
   useEffect(() => {
     setSearchHistory(getSearchHistory());
@@ -120,6 +121,7 @@ export default function Home() {
           region,
           industry,
           type: "site",
+          site: data.site as GeneratedSite,
         })
       );
     } catch (error) {
@@ -159,6 +161,7 @@ export default function Home() {
           region,
           industry,
           type: "pitch",
+          pitch: data.pitch as string,
         })
       );
     } catch (error) {
@@ -461,16 +464,52 @@ export default function Home() {
             <p className={styles.historyEmpty}>まだ生成履歴がありません。</p>
           ) : (
             <ul className={styles.historyList}>
-              {generationHistory.map((entry) => (
-                <li key={entry.id}>
-                  <span className={styles.historyMain}>
-                    {entry.shopName}（{entry.type === "site" ? "HPたたき台" : "営業文"}）
-                  </span>
-                  <span className={styles.historyMeta}>
-                    {entry.region} × {entry.industry}
-                  </span>
-                </li>
-              ))}
+              {generationHistory.map((entry) => {
+                const isExpanded = expandedHistoryId === entry.id;
+
+                return (
+                  <li key={entry.id}>
+                    <button
+                      type="button"
+                      className={styles.historyItemButton}
+                      onClick={() => setExpandedHistoryId(isExpanded ? null : entry.id)}
+                    >
+                      <span className={styles.historyMain}>
+                        {entry.shopName}（{entry.type === "site" ? "HPたたき台" : "営業文"}）
+                      </span>
+                      <span className={styles.historyMeta}>
+                        {entry.region} × {entry.industry}
+                      </span>
+                    </button>
+
+                    {isExpanded && entry.type === "site" && (
+                      <div className={styles.historyDetail}>
+                        <p className={styles.heroCatch}>{entry.site.catchCopy}</p>
+                        <p>{entry.site.introduction}</p>
+                        <ul className={styles.previewList}>
+                          {splitToListItems(entry.site.reasons).map((line) => (
+                            <li key={line}>{line}</li>
+                          ))}
+                        </ul>
+                        <ul className={styles.previewList}>
+                          {splitToListItems(entry.site.services).map((line) => (
+                            <li key={line}>{line}</li>
+                          ))}
+                        </ul>
+                        <p>{entry.site.businessHours}</p>
+                        <p>{entry.site.access}</p>
+                        <p>{entry.site.contactCta}</p>
+                      </div>
+                    )}
+
+                    {isExpanded && entry.type === "pitch" && (
+                      <div className={styles.historyDetail}>
+                        <p className={styles.preLine}>{entry.pitch}</p>
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           )}
         </section>

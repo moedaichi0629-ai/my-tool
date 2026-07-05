@@ -320,6 +320,16 @@
   text-decoration: underline;
 }
 
+.historyDetail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color, #e2e2e2);
+  font-size: 14px;
+}
+
 .historyItemButton:disabled {
   cursor: not-allowed;
   opacity: 0.6;
