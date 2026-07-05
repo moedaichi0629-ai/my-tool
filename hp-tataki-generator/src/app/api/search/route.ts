@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPlaceDetails, searchPlaceIds } from "@/lib/googlePlaces";
+import { isOfficialWebsite } from "@/lib/officialWebsite";
 import { describeFetchError } from "@/lib/errorUtils";
 
 const MAX_RESULTS = 10;
@@ -28,7 +29,7 @@ export async function POST(request: Request) {
     const details = await Promise.all(placeIds.map((id) => getPlaceDetails(id, apiKey)));
 
     const shopsWithoutWebsite = details.filter(
-      (shop): shop is NonNullable<typeof shop> => shop !== null && !shop.website
+      (shop): shop is NonNullable<typeof shop> => shop !== null && !isOfficialWebsite(shop.website)
     );
 
     return NextResponse.json({ shops: shopsWithoutWebsite.slice(0, MAX_RESULTS) });

@@ -327,6 +327,18 @@ export default function Home() {
                       "不明"
                     )}
                   </dd>
+
+                  {shop.website && (
+                    <>
+                      <dt>参考リンク</dt>
+                      <dd>
+                        <a href={shop.website} target="_blank" rel="noopener noreferrer">
+                          予約サイト・SNS等
+                        </a>
+                        <p className={styles.mapUrlText}>{shop.website}</p>
+                      </dd>
+                    </>
+                  )}
                 </dl>
 
                 <div className={styles.actionRow}>
