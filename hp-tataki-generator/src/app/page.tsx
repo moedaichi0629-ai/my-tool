@@ -7,8 +7,12 @@ import { buildStandaloneHtml } from "@/lib/exportHtml";
 import {
   addGenerationHistory,
   addSearchHistory,
+  clearGenerationHistory,
+  clearSearchHistory,
   getGenerationHistory,
   getSearchHistory,
+  removeGenerationHistoryEntry,
+  removeSearchHistoryEntry,
   type GenerationHistoryEntry,
   type SearchHistoryEntry,
 } from "@/lib/history";
@@ -108,6 +112,22 @@ export default function Home() {
     setRegion(entry.region);
     setIndustry(entry.industry);
     runSearch(entry.region, entry.industry);
+  };
+
+  const handleDeleteSearchHistory = (id: string) => {
+    setSearchHistory(removeSearchHistoryEntry(id));
+  };
+
+  const handleClearSearchHistory = () => {
+    setSearchHistory(clearSearchHistory());
+  };
+
+  const handleDeleteGenerationHistory = (id: string) => {
+    setGenerationHistory(removeGenerationHistoryEntry(id));
+  };
+
+  const handleClearGenerationHistory = () => {
+    setGenerationHistory(clearGenerationHistory());
   };
 
   const handleGenerate = async (shop: ShopSummary) => {
@@ -474,13 +494,20 @@ export default function Home() {
         </ul>
 
         <section className={styles.historySection}>
-          <h2>検索履歴</h2>
+          <div className={styles.historyHeader}>
+            <h2>検索履歴</h2>
+            {searchHistory.length > 0 && (
+              <button type="button" className={styles.clearAllButton} onClick={handleClearSearchHistory}>
+                すべて削除
+              </button>
+            )}
+          </div>
           {searchHistory.length === 0 ? (
             <p className={styles.historyEmpty}>まだ検索履歴がありません。</p>
           ) : (
             <ul className={styles.historyList}>
               {searchHistory.map((entry) => (
-                <li key={entry.id}>
+                <li key={entry.id} className={styles.historyRow}>
                   <button
                     type="button"
                     className={styles.historyItemButton}
@@ -492,6 +519,14 @@ export default function Home() {
                     </span>
                     <span className={styles.historyMeta}>{entry.resultCount}件</span>
                   </button>
+                  <button
+                    type="button"
+                    className={styles.deleteButton}
+                    onClick={() => handleDeleteSearchHistory(entry.id)}
+                    aria-label="この検索履歴を削除"
+                  >
+                    削除
+                  </button>
                 </li>
               ))}
             </ul>
@@ -499,7 +534,14 @@ export default function Home() {
         </section>
 
         <section className={styles.historySection}>
-          <h2>生成履歴</h2>
+          <div className={styles.historyHeader}>
+            <h2>生成履歴</h2>
+            {generationHistory.length > 0 && (
+              <button type="button" className={styles.clearAllButton} onClick={handleClearGenerationHistory}>
+                すべて削除
+              </button>
+            )}
+          </div>
           {generationHistory.length === 0 ? (
             <p className={styles.historyEmpty}>まだ生成履歴がありません。</p>
           ) : (
@@ -509,18 +551,28 @@ export default function Home() {
 
                 return (
                   <li key={entry.id}>
-                    <button
-                      type="button"
-                      className={styles.historyItemButton}
-                      onClick={() => setExpandedHistoryId(isExpanded ? null : entry.id)}
-                    >
-                      <span className={styles.historyMain}>
-                        {entry.shopName}（{entry.type === "site" ? "HPたたき台" : "営業文"}）
-                      </span>
-                      <span className={styles.historyMeta}>
-                        {entry.region} × {entry.industry}
-                      </span>
-                    </button>
+                    <div className={styles.historyRow}>
+                      <button
+                        type="button"
+                        className={styles.historyItemButton}
+                        onClick={() => setExpandedHistoryId(isExpanded ? null : entry.id)}
+                      >
+                        <span className={styles.historyMain}>
+                          {entry.shopName}（{entry.type === "site" ? "HPたたき台" : "営業文"}）
+                        </span>
+                        <span className={styles.historyMeta}>
+                          {entry.region} × {entry.industry}
+                        </span>
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.deleteButton}
+                        onClick={() => handleDeleteGenerationHistory(entry.id)}
+                        aria-label="この生成履歴を削除"
+                      >
+                        削除
+                      </button>
+                    </div>
 
                     {isExpanded && entry.type === "site" && (
                       <div className={styles.historyDetail}>

@@ -95,6 +95,14 @@ export function addSearchHistory(
   return writeList(SEARCH_HISTORY_KEY, [newEntry, ...rest]);
 }
 
+export function removeSearchHistoryEntry(id: string): SearchHistoryEntry[] {
+  return writeList(SEARCH_HISTORY_KEY, getSearchHistory().filter((item) => item.id !== id));
+}
+
+export function clearSearchHistory(): SearchHistoryEntry[] {
+  return writeList(SEARCH_HISTORY_KEY, []);
+}
+
 function isValidGenerationEntry(entry: GenerationHistoryEntry): boolean {
   if (entry.type === "site") return typeof entry.site === "object" && entry.site !== null;
   if (entry.type === "pitch") return typeof entry.pitch === "string";
@@ -117,4 +125,12 @@ export function addGenerationHistory(
     (item) => generationHistoryKey(item) !== generationHistoryKey(entry)
   );
   return writeList(GENERATION_HISTORY_KEY, [newEntry, ...rest]);
+}
+
+export function removeGenerationHistoryEntry(id: string): GenerationHistoryEntry[] {
+  return writeList(GENERATION_HISTORY_KEY, getGenerationHistory().filter((item) => item.id !== id));
+}
+
+export function clearGenerationHistory(): GenerationHistoryEntry[] {
+  return writeList(GENERATION_HISTORY_KEY, []);
 }
