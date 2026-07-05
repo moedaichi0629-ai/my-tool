@@ -1,8 +1,16 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import styles from "./page.module.css";
 import { splitToListItems } from "@/lib/textUtils";
+import {
+  addGenerationHistory,
+  addSearchHistory,
+  getGenerationHistory,
+  getSearchHistory,
+  type GenerationHistoryEntry,
+  type SearchHistoryEntry,
+} from "@/lib/history";
 import type { GeneratedSite, ShopSummary } from "@/types";
 
 type GenerationState =
@@ -17,6 +25,12 @@ type PitchState =
   | { status: "done"; pitch: string }
   | { status: "error"; message: string };
 
+type SheetSaveState =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "done" }
+  | { status: "error"; message: string };
+
 export default function Home() {
   const [region, setRegion] = useState("");
   const [industry, setIndustry] = useState("");
@@ -26,6 +40,14 @@ export default function Home() {
   const [shops, setShops] = useState<ShopSummary[]>([]);
   const [generations, setGenerations] = useState<Record<string, GenerationState>>({});
   const [pitches, setPitches] = useState<Record<string, PitchState>>({});
+  const [sheetSaves, setSheetSaves] = useState<Record<string, SheetSaveState>>({});
+  const [searchHistory, setSearchHistory] = useState<SearchHistoryEntry[]>([]);
+  const [generationHistory, setGenerationHistory] = useState<GenerationHistoryEntry[]>([]);
+
+  useEffect(() => {
+    setSearchHistory(getSearchHistory());
+    setGenerationHistory(getGenerationHistory());
+  }, []);
 
   const handleSearch = async (e: FormEvent) => {
     e.preventDefault();
@@ -34,6 +56,7 @@ export default function Home() {
     setShops([]);
     setGenerations({});
     setPitches({});
+    setSheetSaves({});
 
     try {
       const res = await fetch("/api/search", {
@@ -47,7 +70,11 @@ export default function Home() {
         throw new Error(data.error ?? "検索に失敗しました。");
       }
 
-      setShops(data.shops as ShopSummary[]);
+      const foundShops = data.shops as ShopSummary[];
+      setShops(foundShops);
+      setSearchHistory(
+        addSearchHistory({ region, industry, resultCount: foundShops.length })
+      );
     } catch (error) {
       setSearchError(error instanceof Error ? error.message : "検索に失敗しました。");
     } finally {
@@ -75,6 +102,15 @@ export default function Home() {
         ...prev,
         [shop.placeId]: { status: "done", site: data.site as GeneratedSite },
       }));
+      setGenerationHistory(
+        addGenerationHistory({
+          placeId: shop.placeId,
+          shopName: shop.name,
+          region,
+          industry,
+          type: "site",
+        })
+      );
     } catch (error) {
       setGenerations((prev) => ({
         ...prev,
@@ -105,12 +141,48 @@ export default function Home() {
         ...prev,
         [shop.placeId]: { status: "done", pitch: data.pitch as string },
       }));
+      setGenerationHistory(
+        addGenerationHistory({
+          placeId: shop.placeId,
+          shopName: shop.name,
+          region,
+          industry,
+          type: "pitch",
+        })
+      );
     } catch (error) {
       setPitches((prev) => ({
         ...prev,
         [shop.placeId]: {
           status: "error",
           message: error instanceof Error ? error.message : "営業文の生成に失敗しました。",
+        },
+      }));
+    }
+  };
+
+  const handleSaveToSheet = async (shop: ShopSummary) => {
+    setSheetSaves((prev) => ({ ...prev, [shop.placeId]: { status: "loading" } }));
+
+    try {
+      const res = await fetch("/api/save-to-sheet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ shopName: shop.name, mapUrl: shop.mapUrl, region, industry }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error ?? "スプレッドシートへの保存に失敗しました。");
+      }
+
+      setSheetSaves((prev) => ({ ...prev, [shop.placeId]: { status: "done" } }));
+    } catch (error) {
+      setSheetSaves((prev) => ({
+        ...prev,
+        [shop.placeId]: {
+          status: "error",
+          message: error instanceof Error ? error.message : "スプレッドシートへの保存に失敗しました。",
         },
       }));
     }
@@ -161,6 +233,7 @@ export default function Home() {
           {shops.map((shop) => {
             const generation = generations[shop.placeId] ?? { status: "idle" };
             const pitch = pitches[shop.placeId] ?? { status: "idle" };
+            const sheetSave = sheetSaves[shop.placeId] ?? { status: "idle" };
 
             return (
               <li key={shop.placeId} className={styles.shopCard}>
@@ -203,14 +276,30 @@ export default function Home() {
                   </dd>
                 </dl>
 
-                <button
-                  type="button"
-                  className={styles.generateButton}
-                  onClick={() => handleGenerate(shop)}
-                  disabled={generation.status === "loading"}
-                >
-                  {generation.status === "loading" ? "生成中..." : "HPたたき台を作成"}
-                </button>
+                <div className={styles.actionRow}>
+                  <button
+                    type="button"
+                    className={styles.generateButton}
+                    onClick={() => handleGenerate(shop)}
+                    disabled={generation.status === "loading"}
+                  >
+                    {generation.status === "loading" ? "生成中..." : "HPたたき台を作成"}
+                  </button>
+
+                  <button
+                    type="button"
+                    className={styles.sheetButton}
+                    onClick={() => handleSaveToSheet(shop)}
+                    disabled={sheetSave.status === "loading"}
+                  >
+                    {sheetSave.status === "loading" ? "保存中..." : "スプレッドシートに保存"}
+                  </button>
+                </div>
+
+                {sheetSave.status === "error" && <p className={styles.error}>{sheetSave.message}</p>}
+                {sheetSave.status === "done" && (
+                  <p className={styles.sheetSavedNote}>スプレッドシートに保存しました。</p>
+                )}
 
                 {generation.status === "error" && (
                   <p className={styles.error}>{generation.message}</p>
@@ -308,6 +397,46 @@ export default function Home() {
             );
           })}
         </ul>
+
+        <section className={styles.historySection}>
+          <h2>検索履歴</h2>
+          {searchHistory.length === 0 ? (
+            <p className={styles.historyEmpty}>まだ検索履歴がありません。</p>
+          ) : (
+            <ul className={styles.historyList}>
+              {searchHistory.map((entry) => (
+                <li key={entry.id}>
+                  <span className={styles.historyMain}>
+                    {entry.region} × {entry.industry}
+                  </span>
+                  <span className={styles.historyMeta}>
+                    {entry.resultCount}件 / {new Date(entry.timestamp).toLocaleString("ja-JP")}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <section className={styles.historySection}>
+          <h2>生成履歴</h2>
+          {generationHistory.length === 0 ? (
+            <p className={styles.historyEmpty}>まだ生成履歴がありません。</p>
+          ) : (
+            <ul className={styles.historyList}>
+              {generationHistory.map((entry) => (
+                <li key={entry.id}>
+                  <span className={styles.historyMain}>
+                    {entry.shopName}（{entry.type === "site" ? "HPたたき台" : "営業文"}）
+                  </span>
+                  <span className={styles.historyMeta}>
+                    {entry.region} × {entry.industry} / {new Date(entry.timestamp).toLocaleString("ja-JP")}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
       </main>
     </div>
   );

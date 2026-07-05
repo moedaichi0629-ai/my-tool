@@ -20,6 +20,8 @@ Googleマップ上で公式ホームページが未設定の可能性がある�
 ・AIによるホームページたたき台生成（キャッチコピー〜お問い合わせまで7セクション）
 ・ホームページ風プレビュー表示（お問い合わせの電話番号はタップして発信可能）
 ・AIによる営業提案文の下書き生成
+・店舗名とGoogleマップURLをGoogleスプレッドシートに保存（検索の地域×業種ごとにシートタブを自動作成）
+・検索履歴・生成履歴の表示（ブラウザのlocalStorageに保存）
 ・レスポンシブ対応
 
 ## 使用技術
@@ -30,6 +32,7 @@ Googleマップ上で公式ホームページが未設定の可能性がある�
 - CSS Modules
 - Google Places API（Text Search / Place Details）
 - OpenAI API（Chat Completions）
+- Google Sheets API（店舗名・URLの保存）
 
 ## ディレクトリ構成
 
@@ -48,10 +51,13 @@ hp-tataki-generator/
 │   │   └── api/
 │   │       ├── search/route.ts        # 店舗検索API（Google Places連携）
 │   │       ├── generate/route.ts      # HPたたき台生成API（OpenAI連携）
-│   │       └── sales-pitch/route.ts   # 営業提案文生成API（OpenAI連携）
+│   │       ├── sales-pitch/route.ts   # 営業提案文生成API（OpenAI連携）
+│   │       └── save-to-sheet/route.ts # 店舗名・URLのスプレッドシート保存API
 │   └── lib/
 │       ├── googlePlaces.ts    # Google Places APIの呼び出し処理
 │       ├── openaiClient.ts    # OpenAI APIの呼び出し処理・プロンプト
+│       ├── googleSheets.ts    # Google Sheets APIへの書き込み処理
+│       ├── history.ts         # 検索履歴・生成履歴のlocalStorage管理
 │       ├── errorUtils.ts      # ネットワークエラーの原因推測メッセージ生成
 │       └── textUtils.ts       # AI出力の箇条書きテキスト整形
 └── tsconfig.json
@@ -91,11 +97,39 @@ hp-tataki-generator/
 GOOGLE_PLACES_API_KEY=
 OPENAI_API_KEY=
 OPENAI_MODEL=gpt-4o-mini
+GOOGLE_SHEETS_SPREADSHEET_ID=
+GOOGLE_SHEETS_CREDENTIALS_FILE=google-sheets-credentials.json
 ```
 
 - `GOOGLE_PLACES_API_KEY`: Google CloudでPlaces APIを有効化して取得したキー
 - `OPENAI_API_KEY`: OpenAI Platformで取得したシークレットキー
 - `OPENAI_MODEL`: 使用するモデル（省略時は `gpt-4o-mini`）
+- `GOOGLE_SHEETS_SPREADSHEET_ID`: 保存先スプレッドシートのID（URLの `/d/` と `/edit` の間の文字列）
+- `GOOGLE_SHEETS_CREDENTIALS_FILE`: サービスアカウントのJSONキーファイルのパス（ローカル実行用。プロジェクト直下からの相対パス）
+- `GOOGLE_SHEETS_SERVICE_ACCOUNT_JSON`: サービスアカウントのJSONキーの中身をそのまま貼り付けたもの（Vercelなどファイルを配置できない環境用。設定されている場合はこちらが優先されます）
+
+### スプレッドシート連携の準備
+
+**ローカル実行の場合**
+
+1. Google Cloudでサービスアカウントを作成し、JSONキーファイルをダウンロード
+2. Google Sheets APIを有効化
+3. ダウンロードしたJSONファイルを `hp-tataki-generator` フォルダ直下に置く（例: `google-sheets-credentials.json`。このファイルは `.gitignore` 済みでGitには含まれません）
+4. 保存先にしたいスプレッドシートを開き、「共有」からJSONファイル内の `client_email`（`xxx@xxx.iam.gserviceaccount.com` の形式）を編集者として追加
+5. `.env.local` の `GOOGLE_SHEETS_SPREADSHEET_ID` と `GOOGLE_SHEETS_CREDENTIALS_FILE`（配置したファイル名）を設定
+
+`private_key` や改行の扱いを手動でコピペする必要はなく、JSONファイルを置くだけで動作します。
+
+**Vercelにデプロイする場合**
+
+ファイルをサーバーにアップロードできないため、代わりにJSONキーの中身をそのまま環境変数に設定します。
+
+1. 上記1〜4と同様にサービスアカウントを準備し、スプレッドシートを共有
+2. ダウンロードしたJSONファイルをテキストエディタで開き、中身をすべてコピー
+3. Vercelの `Settings` → `Environment Variables` で `GOOGLE_SHEETS_SERVICE_ACCOUNT_JSON` にコピーした内容をそのまま貼り付け（改行を含んでいても問題ありません）
+4. `GOOGLE_SHEETS_SPREADSHEET_ID` も同様に設定し、再デプロイ
+
+「スプレッドシートに保存」ボタンを押すと、検索した地域×業種ごとにシートタブが自動作成され、店舗名・GoogleマップURL・地域・業種・保存日時が1行追加されます。
 
 ## 今後追加予定
 
@@ -131,3 +165,5 @@ OPENAI_MODEL=gpt-4o-mini
 - 「website が空欄」であることを、アプリ内では常に「ホームページがない」と断定せず、「Googleマップ上で公式ホームページが未設定の可能性がある」という表現で扱っています。実際には別ドメインで運用している、SNSのみで運用しているなどのケースもあるため、営業・提案の際は事前確認をおすすめします。
 - APIの呼び出しには料金が発生する場合があります（Google Places API・OpenAI APIともに従量課金）。テスト時は検索回数・生成回数に注意してください。
 - 生成される文章はAIによる推測を含みます。実際に営業・提案で利用する前に、内容の事実確認（住所・電話番号・営業時間など）を必ず行ってください。
+- 検索履歴・生成履歴はブラウザのlocalStorageに保存されます。別のブラウザ・端末とは共有されず、ブラウザのデータを消去すると履歴も消えます。
+- スプレッドシートへの保存はボタンを押したときのみ実行されます（自動保存ではありません）。
