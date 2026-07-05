@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import styles from "./page.module.css";
 import { splitToListItems } from "@/lib/textUtils";
+import { buildStandaloneHtml } from "@/lib/exportHtml";
 import {
   addGenerationHistory,
   addSearchHistory,
@@ -186,6 +187,17 @@ export default function Home() {
         },
       }));
     }
+  };
+
+  const handleDownloadHtml = (shop: ShopSummary, site: GeneratedSite) => {
+    const html = buildStandaloneHtml(shop, site);
+    const blob = new Blob([html], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${shop.name}-hp.html`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -374,14 +386,24 @@ export default function Home() {
                       </section>
                     </div>
 
-                    <button
-                      type="button"
-                      className={styles.pitchButton}
-                      onClick={() => handleGeneratePitch(shop)}
-                      disabled={pitch.status === "loading"}
-                    >
-                      {pitch.status === "loading" ? "作成中..." : "営業文を作成"}
-                    </button>
+                    <div className={styles.actionRow}>
+                      <button
+                        type="button"
+                        className={styles.pitchButton}
+                        onClick={() => handleGeneratePitch(shop)}
+                        disabled={pitch.status === "loading"}
+                      >
+                        {pitch.status === "loading" ? "作成中..." : "営業文を作成"}
+                      </button>
+
+                      <button
+                        type="button"
+                        className={styles.pitchButton}
+                        onClick={() => handleDownloadHtml(shop, generation.site)}
+                      >
+                        HTMLでダウンロード
+                      </button>
+                    </div>
 
                     {pitch.status === "error" && <p className={styles.error}>{pitch.message}</p>}
 

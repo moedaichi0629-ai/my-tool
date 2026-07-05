@@ -20,6 +20,7 @@ Googleマップ上で公式ホームページが未設定の可能性がある�
 ・AIによるホームページたたき台生成（キャッチコピー〜お問い合わせまで7セクション）
 ・ホームページ風プレビュー表示（お問い合わせの電話番号はタップして発信可能）
 ・AIによる営業提案文の下書き生成
+・生成したHPプレビューを単体のHTMLファイルとしてダウンロード
 ・店舗名とGoogleマップURLをGoogleスプレッドシートに保存（検索の地域×業種ごとにシートタブを自動作成）
 ・検索履歴・生成履歴の表示（ブラウザのlocalStorageに保存）
 ・レスポンシブ対応
@@ -58,6 +59,7 @@ hp-tataki-generator/
 │       ├── openaiClient.ts    # OpenAI APIの呼び出し処理・プロンプト
 │       ├── googleSheets.ts    # Google Sheets APIへの書き込み処理
 │       ├── history.ts         # 検索履歴・生成履歴のlocalStorage管理
+│       ├── exportHtml.ts      # HPプレビューの単体HTMLファイル生成
 │       ├── errorUtils.ts      # ネットワークエラーの原因推測メッセージ生成
 │       └── textUtils.ts       # AI出力の箇条書きテキスト整形
 └── tsconfig.json
@@ -133,7 +135,6 @@ GOOGLE_SHEETS_CREDENTIALS_FILE=google-sheets-credentials.json
 
 ## 今後追加予定
 
-・HTMLとしてホームページを書き出す
 ・画像生成AI連携
 ・営業メール自動生成
 ・LINE営業文生成
