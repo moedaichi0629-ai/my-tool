@@ -32,6 +32,21 @@ type SheetSaveState =
   | { status: "done" }
   | { status: "error"; message: string };
 
+const REGION_SUGGESTIONS = ["広島市", "福岡市", "大阪市", "名古屋市", "札幌市", "仙台市"];
+
+const INDUSTRY_SUGGESTIONS = [
+  "美容室",
+  "ネイルサロン",
+  "エステ",
+  "整体院",
+  "整骨院",
+  "リラクゼーション",
+  "学習塾",
+  "工務店",
+  "税理士事務所",
+  "ペットサロン",
+];
+
 export default function Home() {
   const [region, setRegion] = useState("");
   const [industry, setIndustry] = useState("");
@@ -226,6 +241,7 @@ export default function Home() {
           <label className={styles.field}>
             <span>地域</span>
             <input
+              list="region-suggestions"
               value={region}
               onChange={(e) => setRegion(e.target.value)}
               placeholder="例: 広島市"
@@ -235,6 +251,7 @@ export default function Home() {
           <label className={styles.field}>
             <span>業種</span>
             <input
+              list="industry-suggestions"
               value={industry}
               onChange={(e) => setIndustry(e.target.value)}
               placeholder="例: 美容室"
@@ -245,6 +262,17 @@ export default function Home() {
             {searching ? "検索中..." : "検索する"}
           </button>
         </form>
+
+        <datalist id="region-suggestions">
+          {REGION_SUGGESTIONS.map((item) => (
+            <option key={item} value={item} />
+          ))}
+        </datalist>
+        <datalist id="industry-suggestions">
+          {INDUSTRY_SUGGESTIONS.map((item) => (
+            <option key={item} value={item} />
+          ))}
+        </datalist>
 
         {searchError && <p className={styles.error}>{searchError}</p>}
 
