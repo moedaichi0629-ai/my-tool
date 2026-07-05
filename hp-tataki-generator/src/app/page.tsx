@@ -50,8 +50,7 @@ export default function Home() {
     setGenerationHistory(getGenerationHistory());
   }, []);
 
-  const handleSearch = async (e: FormEvent) => {
-    e.preventDefault();
+  const runSearch = async (searchRegion: string, searchIndustry: string) => {
     setSearching(true);
     setSearchError(null);
     setShops([]);
@@ -63,7 +62,7 @@ export default function Home() {
       const res = await fetch("/api/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ region, industry }),
+        body: JSON.stringify({ region: searchRegion, industry: searchIndustry }),
       });
       const data = await res.json();
 
@@ -74,7 +73,7 @@ export default function Home() {
       const foundShops = data.shops as ShopSummary[];
       setShops(foundShops);
       setSearchHistory(
-        addSearchHistory({ region, industry, resultCount: foundShops.length })
+        addSearchHistory({ region: searchRegion, industry: searchIndustry, resultCount: foundShops.length })
       );
     } catch (error) {
       setSearchError(error instanceof Error ? error.message : "検索に失敗しました。");
@@ -82,6 +81,17 @@ export default function Home() {
       setSearching(false);
       setHasSearched(true);
     }
+  };
+
+  const handleSearch = (e: FormEvent) => {
+    e.preventDefault();
+    runSearch(region, industry);
+  };
+
+  const handleHistorySearch = (entry: SearchHistoryEntry) => {
+    setRegion(entry.region);
+    setIndustry(entry.industry);
+    runSearch(entry.region, entry.industry);
   };
 
   const handleGenerate = async (shop: ShopSummary) => {
@@ -428,12 +438,19 @@ export default function Home() {
             <ul className={styles.historyList}>
               {searchHistory.map((entry) => (
                 <li key={entry.id}>
-                  <span className={styles.historyMain}>
-                    {entry.region} × {entry.industry}
-                  </span>
-                  <span className={styles.historyMeta}>
-                    {entry.resultCount}件 / {new Date(entry.timestamp).toLocaleString("ja-JP")}
-                  </span>
+                  <button
+                    type="button"
+                    className={styles.historyItemButton}
+                    onClick={() => handleHistorySearch(entry)}
+                    disabled={searching}
+                  >
+                    <span className={styles.historyMain}>
+                      {entry.region} × {entry.industry}
+                    </span>
+                    <span className={styles.historyMeta}>
+                      {entry.resultCount}件 / {new Date(entry.timestamp).toLocaleString("ja-JP")}
+                    </span>
+                  </button>
                 </li>
               ))}
             </ul>

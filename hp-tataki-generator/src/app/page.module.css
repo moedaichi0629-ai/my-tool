@@ -307,6 +307,24 @@
   font-size: 14px;
 }
 
+.historyItemButton {
+  all: unset;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.historyItemButton:hover {
+  text-decoration: underline;
+}
+
+.historyItemButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .historyMain {
   font-weight: 600;
 }
