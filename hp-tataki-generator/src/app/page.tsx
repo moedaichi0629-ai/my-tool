@@ -447,9 +447,7 @@ export default function Home() {
                     <span className={styles.historyMain}>
                       {entry.region} × {entry.industry}
                     </span>
-                    <span className={styles.historyMeta}>
-                      {entry.resultCount}件 / {new Date(entry.timestamp).toLocaleString("ja-JP")}
-                    </span>
+                    <span className={styles.historyMeta}>{entry.resultCount}件</span>
                   </button>
                 </li>
               ))}
@@ -469,7 +467,7 @@ export default function Home() {
                     {entry.shopName}（{entry.type === "site" ? "HPたたき台" : "営業文"}）
                   </span>
                   <span className={styles.historyMeta}>
-                    {entry.region} × {entry.industry} / {new Date(entry.timestamp).toLocaleString("ja-JP")}
+                    {entry.region} × {entry.industry}
                   </span>
                 </li>
               ))}

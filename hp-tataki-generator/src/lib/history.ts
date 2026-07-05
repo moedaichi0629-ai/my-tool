@@ -7,7 +7,6 @@ export interface SearchHistoryEntry {
   region: string;
   industry: string;
   resultCount: number;
-  timestamp: string;
 }
 
 export interface GenerationHistoryEntry {
@@ -17,7 +16,6 @@ export interface GenerationHistoryEntry {
   region: string;
   industry: string;
   type: "site" | "pitch";
-  timestamp: string;
 }
 
 function readList<T>(key: string): T[] {
@@ -47,14 +45,13 @@ export function getSearchHistory(): SearchHistoryEntry[] {
 }
 
 export function addSearchHistory(
-  entry: Omit<SearchHistoryEntry, "id" | "timestamp">
+  entry: Omit<SearchHistoryEntry, "id">
 ): SearchHistoryEntry[] {
-  const newEntry: SearchHistoryEntry = {
-    ...entry,
-    id: createId(),
-    timestamp: new Date().toISOString(),
-  };
-  return writeList(SEARCH_HISTORY_KEY, [newEntry, ...readList<SearchHistoryEntry>(SEARCH_HISTORY_KEY)]);
+  const newEntry: SearchHistoryEntry = { ...entry, id: createId() };
+  const rest = readList<SearchHistoryEntry>(SEARCH_HISTORY_KEY).filter(
+    (item) => !(item.region === entry.region && item.industry === entry.industry)
+  );
+  return writeList(SEARCH_HISTORY_KEY, [newEntry, ...rest]);
 }
 
 export function getGenerationHistory(): GenerationHistoryEntry[] {
@@ -62,15 +59,11 @@ export function getGenerationHistory(): GenerationHistoryEntry[] {
 }
 
 export function addGenerationHistory(
-  entry: Omit<GenerationHistoryEntry, "id" | "timestamp">
+  entry: Omit<GenerationHistoryEntry, "id">
 ): GenerationHistoryEntry[] {
-  const newEntry: GenerationHistoryEntry = {
-    ...entry,
-    id: createId(),
-    timestamp: new Date().toISOString(),
-  };
-  return writeList(
-    GENERATION_HISTORY_KEY,
-    [newEntry, ...readList<GenerationHistoryEntry>(GENERATION_HISTORY_KEY)]
+  const newEntry: GenerationHistoryEntry = { ...entry, id: createId() };
+  const rest = readList<GenerationHistoryEntry>(GENERATION_HISTORY_KEY).filter(
+    (item) => !(item.placeId === entry.placeId && item.type === entry.type)
   );
+  return writeList(GENERATION_HISTORY_KEY, [newEntry, ...rest]);
 }
