@@ -29,6 +29,21 @@ export function buildStandaloneHtml(shop: ShopSummary, site: GeneratedSite): str
     ? `<a class="tel-button" href="tel:${escapeHtml(shop.phoneNumber)}">${escapeHtml(shop.phoneNumber)} に電話する</a>`
     : "";
 
+  const websiteRefHtml = shop.website
+    ? `<p><a href="${escapeHtml(shop.website)}" target="_blank" rel="noopener noreferrer">予約サイト・SNS等</a></p>`
+    : "";
+
+  const infoRowsHtml = [
+    ["住所", escapeHtml(shop.address || "不明")],
+    ["電話番号", shop.phoneNumber ? escapeHtml(shop.phoneNumber) : "不明"],
+    ["営業時間", openingHoursHtml || "不明"],
+    ["評価", shop.rating !== null ? escapeHtml(String(shop.rating)) : "不明"],
+    ["Googleマップ", mapLinkHtml || "不明"],
+    ...(websiteRefHtml ? [["参考リンク", websiteRefHtml]] : []),
+  ]
+    .map(([label, value]) => `<div class="info-row"><dt>${label}</dt><dd>${value}</dd></div>`)
+    .join("\n");
+
   return `<!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -48,6 +63,11 @@ export function buildStandaloneHtml(shop: ShopSummary, site: GeneratedSite): str
   .contact { background: #f7f8fa; }
   .tel-button { display: inline-block; margin-top: 12px; padding: 12px 24px; border-radius: 8px; background: #1a9e5c; color: #fff; font-weight: 700; text-decoration: none; }
   a { color: #2d6cdf; }
+  .info-section { display: flex; flex-direction: column; gap: 10px; }
+  .info-row { display: grid; grid-template-columns: 100px 1fr; gap: 12px; font-size: 14px; }
+  .info-row dt { font-weight: 600; color: #666; margin: 0; }
+  .info-row dd { margin: 0; }
+  .info-row p { margin: 0; }
 </style>
 </head>
 <body>
@@ -55,6 +75,10 @@ export function buildStandaloneHtml(shop: ShopSummary, site: GeneratedSite): str
     <h1>${escapeHtml(site.catchCopy)}</h1>
   </div>
   <main>
+    <section class="info-section">
+      <h2>店舗情報</h2>
+      ${infoRowsHtml}
+    </section>
     <section>
       <h2>店舗紹介</h2>
       <p>${escapeHtml(site.introduction)}</p>
