@@ -40,30 +40,52 @@ function createId(): string {
     : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+function dedupeByKey<T>(list: T[], keyOf: (item: T) => string): T[] {
+  const seen = new Set<string>();
+  const result: T[] = [];
+  for (const item of list) {
+    const key = keyOf(item);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(item);
+  }
+  return result;
+}
+
+const searchHistoryKey = (entry: Pick<SearchHistoryEntry, "region" | "industry">) =>
+  `${entry.region}|${entry.industry}`;
+
+const generationHistoryKey = (entry: Pick<GenerationHistoryEntry, "placeId" | "type">) =>
+  `${entry.placeId}|${entry.type}`;
+
 export function getSearchHistory(): SearchHistoryEntry[] {
-  return readList<SearchHistoryEntry>(SEARCH_HISTORY_KEY);
+  const list = readList<SearchHistoryEntry>(SEARCH_HISTORY_KEY);
+  const deduped = dedupeByKey(list, searchHistoryKey);
+  return deduped.length === list.length ? deduped : writeList(SEARCH_HISTORY_KEY, deduped);
 }
 
 export function addSearchHistory(
   entry: Omit<SearchHistoryEntry, "id">
 ): SearchHistoryEntry[] {
   const newEntry: SearchHistoryEntry = { ...entry, id: createId() };
-  const rest = readList<SearchHistoryEntry>(SEARCH_HISTORY_KEY).filter(
-    (item) => !(item.region === entry.region && item.industry === entry.industry)
+  const rest = getSearchHistory().filter(
+    (item) => searchHistoryKey(item) !== searchHistoryKey(entry)
   );
   return writeList(SEARCH_HISTORY_KEY, [newEntry, ...rest]);
 }
 
 export function getGenerationHistory(): GenerationHistoryEntry[] {
-  return readList<GenerationHistoryEntry>(GENERATION_HISTORY_KEY);
+  const list = readList<GenerationHistoryEntry>(GENERATION_HISTORY_KEY);
+  const deduped = dedupeByKey(list, generationHistoryKey);
+  return deduped.length === list.length ? deduped : writeList(GENERATION_HISTORY_KEY, deduped);
 }
 
 export function addGenerationHistory(
   entry: Omit<GenerationHistoryEntry, "id">
 ): GenerationHistoryEntry[] {
   const newEntry: GenerationHistoryEntry = { ...entry, id: createId() };
-  const rest = readList<GenerationHistoryEntry>(GENERATION_HISTORY_KEY).filter(
-    (item) => !(item.placeId === entry.placeId && item.type === entry.type)
+  const rest = getGenerationHistory().filter(
+    (item) => generationHistoryKey(item) !== generationHistoryKey(entry)
   );
   return writeList(GENERATION_HISTORY_KEY, [newEntry, ...rest]);
 }
