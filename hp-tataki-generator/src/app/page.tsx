@@ -191,9 +191,12 @@ export default function Home() {
                   <dt>Googleマップ</dt>
                   <dd>
                     {shop.mapUrl ? (
-                      <a href={shop.mapUrl} target="_blank" rel="noopener noreferrer">
-                        地図で見る
-                      </a>
+                      <>
+                        <a href={shop.mapUrl} target="_blank" rel="noopener noreferrer">
+                          地図で見る
+                        </a>
+                        <p className={styles.mapUrlText}>{shop.mapUrl}</p>
+                      </>
                     ) : (
                       "不明"
                     )}
@@ -262,9 +265,12 @@ export default function Home() {
                         <p>{generation.site.access}</p>
                         <p className={styles.previewAddress}>{shop.address}</p>
                         {shop.mapUrl && (
-                          <a href={shop.mapUrl} target="_blank" rel="noopener noreferrer">
-                            Googleマップで見る
-                          </a>
+                          <>
+                            <a href={shop.mapUrl} target="_blank" rel="noopener noreferrer">
+                              Googleマップで見る
+                            </a>
+                            <p className={styles.mapUrlText}>{shop.mapUrl}</p>
+                          </>
                         )}
                       </section>
 

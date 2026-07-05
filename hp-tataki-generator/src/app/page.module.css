@@ -198,6 +198,12 @@
   font-size: 14px;
 }
 
+.mapUrlText {
+  color: var(--text-secondary, #666);
+  font-size: 12px;
+  word-break: break-all;
+}
+
 .contactSection {
   background: var(--contact-bg, #f7f8fa);
   align-items: flex-start;
