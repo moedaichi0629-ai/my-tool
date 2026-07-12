@@ -1,0 +1,25 @@
+# 仮想環境
+venv/
+.venv/
+env/
+
+# 秘密情報（APIキーなど - 絶対にGitHubにあげてはいけない）
+.env
+credentials.json
+token.pickle
+*.pickle
+
+# 大きすぎるバイナリファイル
+*.exe
+
+# Pythonのキャッシュファイル
+__pycache__/
+*.pyc
+*.pyo
+
+# 画像ファイル（容量が大きいため除外）
+images/
+
+# OS・エディタの自動生成ファイル
+.DS_Store
+Thumbs.db
