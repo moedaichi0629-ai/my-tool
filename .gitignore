@@ -6,6 +6,7 @@ env/
 # 秘密情報（APIキーなど - 絶対にGitHubにあげてはいけない）
 .env
 credentials.json
+google-sheets-credentials*.json
 token.pickle
 *.pickle
 
@@ -17,9 +18,21 @@ __pycache__/
 *.pyc
 *.pyo
 
+# Node.js
+node_modules/
+
 # 画像ファイル（容量が大きいため除外）
 images/
 
 # OS・エディタの自動生成ファイル
 .DS_Store
 Thumbs.db
+
+# 独立したGitリポジトリとして別管理しているツール
+# （このmy-toolリポジトリには含めず、各自のGitHubリポジトリで管理）
+/writing-correction-tool/
+/line-dify-bot/
+/kabuki-chatbot/
+/todo-app/
+/todo-list-app/
+/weather-forecast-app/
