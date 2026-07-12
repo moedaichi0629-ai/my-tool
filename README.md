@@ -21,7 +21,7 @@ Googleカレンダーと連携し、空き時間の候補日と送信用文章�
 - LINE・メール用の文章を自動生成
 - 確定した予定をカレンダーに直接登録
 
-**デモ:** https://my-tool-xpv5memhwjfqnsupvuudfk.streamlit.app
+**デモ:** https://schedule-adjustment-tool-eap349ikdfvjevnzg55qi7.streamlit.app
 **詳細:** [schedule-adjustment-tool/](schedule-adjustment-tool/)
 
 ---
