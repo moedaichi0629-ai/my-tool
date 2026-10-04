@@ -1,131 +1,37 @@
-# My Tool - AIツール集
+# 個人開発作品の案内
 
-日常の面倒な作業をAIで自動化する個人開発ツール群です。Web開発の学習用に作った小さなアプリも含めて、作ったものを一覧にしています。
+これまでのAI活用ツール・Webアプリへのリンクをまとめたリポジトリです。各作品のコード・現在の実装範囲・セットアップは、独立リポジトリで管理しています。
 
-## 目次
+**作品紹介の入口：** [AI・業務自動化ポートフォリオ](https://moedaichi0629-ai.github.io/landing-page/)
 
-- [AI活用ツール](#ai活用ツール)
-- [学習用ミニアプリ](#学習用ミニアプリ)
-- [技術スタック](#技術スタック)
-- [注意事項](#注意事項)
+## 主力作品
 
----
-
-## AI活用ツール
-
-### 📅 日程調整支援ツール
-Googleカレンダーと連携し、空き時間の候補日と送信用文章を自動生成するWebアプリ。
-
-- Googleカレンダーの空き時間を自動で抽出
-- 候補日を最大5件提案（ダブルブッキング防止）
-- LINE・メール用の文章を自動生成
-- 確定した予定をカレンダーに直接登録
-
-**デモ:** https://schedule-adjustment-tool-eap349ikdfvjevnzg55qi7.streamlit.app
-**詳細:** [schedule-adjustment-tool/](schedule-adjustment-tool/)
-
----
-
-### 🏠 AIホームページたたき台ジェネレーター
-Google Places APIで公式サイト未設定の店舗を検索し、AIがホームページのたたき台を自動生成するWebアプリ。
-
-- 地域・業種から店舗検索、公式サイト未設定店舗を抽出
-- AIによるホームページたたき台生成（キャッチコピー〜お問い合わせまで7セクション）
-- 生成したHPプレビューを単体HTMLファイルとしてダウンロード
-- 検索結果をGoogleスプレッドシートに保存
-
-**詳細:** [hp-tataki-generator/](hp-tataki-generator/)
-
----
-
-### 📸 ライブアルバムツール
-LINEグループの写真を自動で取得し、Google Drive・スプレッドシートに整理するツール。
-
-- LINE Messaging API連携
-- Google Drive・Sheets連携
-
-**詳細:** [live_album_tool/](live_album_tool/)
-
----
-
-### 🍽️ 食事管理ツール（LINE食事記録Bot）
-食事写真をLINEに送るだけで、AIが食事内容を解析してGoogleスプレッドシートに記録するBot。
-
-- AIによる食事写真解析（料理名・食材の自動判定）
-- 日次・週次の振り返りレポート自動生成
-- 翌週の献立・買い物リスト自動生成
-
-**詳細:** [meal_management_tool/](meal_management_tool/)
-
----
-
-### ✍️ 文章校正ツール
-入力した文章をAIが校正・改善するツール。
-
-**デモ:** https://writing-correction-tool-mygnto9hpkyehkzquhma9q.streamlit.app
-**リポジトリ:** https://github.com/moedaichi0629-ai/writing-correction-tool
-
----
-
-### 🎭 歌舞伎予習チャットボット
-歌舞伎観劇前の予習をAIがサポートするチャットWebアプリ。
-
-- AIとのチャットで演目・役者・用語を質問できる
-- 配役情報を入力するだけで観劇前予習を自動生成
-- 20演目・17シネマ歌舞伎作品・役者・用語をローカルデータで即検索
-
-**デモ:** https://heroic-blini-04272e.netlify.app
-**リポジトリ:** https://github.com/moedaichi0629-ai/kabuki-chatbot
-
----
-
-### 🤖 LINE × Dify AIチャットボット
-LINEで送ったメッセージをDify AIに転送し、AIの回答をLINEに返信するチャットボット。
-
-**リポジトリ:** https://github.com/moedaichi0629-ai/line-dify-bot
-
----
-
-## 学習用ミニアプリ
-
-Web開発の基礎（外部API連携・状態管理・データ永続化）を学ぶために作った小規模アプリです。
-
-### ✅ Todoリスト（Flask + Googleスプレッドシート）
-タスクをGoogleスプレッドシートに保存するTodo管理アプリ。データベース不要で、スプレッドシートを開けばデータを直接確認・編集できる。
-
-**デモ:** https://todo-app-1p8e.onrender.com
-**リポジトリ:** https://github.com/moedaichi0629-ai/todo-app
-
-### ✅ Todoリスト（Next.js + localStorage）
-カテゴリ・タグ・期限日管理に対応したブラウザ完結型のTodoアプリ。
-
-**デモ:** https://todo-list-app-six-blue.vercel.app/
-**リポジトリ:** https://github.com/moedaichi0629-ai/todo-list-app
-
-### ☀️ 天気予報アプリ
-都市名を入力すると気温・天気・湿度・降水確率をまとめて確認できるWebアプリ。OpenWeatherMap API連携。
-
-**デモ:** https://weather-forecast-app-liart-two.vercel.app/
-**リポジトリ:** https://github.com/moedaichi0629-ai/weather-forecast-app
-
----
-
-## 技術スタック
-
-| カテゴリ | 技術 |
+| 作品 | 内容 |
 |---|---|
-| 言語 | Python 3.10+ / TypeScript |
-| フレームワーク | Next.js / React / Streamlit / Flask |
-| AI | Claude API / OpenAI API / Dify |
-| 認証 | Google OAuth 2.0 |
-| 外部サービス | Google Calendar / Drive / Sheets / Places API, LINE API, OpenWeatherMap API |
+| [美容室向けLINE問い合わせAI Bot](https://github.com/moedaichi0629-ai/line-reservation-bot) | 美容室に届く営業時間・設備などの質問へ、登録済みFAQをもとにAIが回答し、スタッフの問い合わせ対応を支援します。 |
+| [Googleマップ店舗情報収集・営業管理ツール](https://github.com/moedaichi0629-ai/hp-tataki-generator) | Googleマップから店舗情報を集め、HP制作の提案先を一覧で管理し、営業状況や制作したHPのURLを記録するWebアプリです。 |
+| [クラウドワークスAI営業支援システム](https://github.com/moedaichi0629-ai/crowdworks-sales-assistant) | 案件収集から適合度分析、応募文の作成、応募後の履歴管理、営業KPIの振り返りまでを支援するローカルアプリです。 |
+| [GAS × AI ブログ記事下書き生成ツール](https://github.com/moedaichi0629-ai/gas-ai-blog-automation) | スプレッドシートのキーワードから記事のタイトル・本文・メタディスクリプションを生成し、同じシートに書き出すツールです。 |
+| [Googleサービス連携 予約受付自動化ツール](https://github.com/moedaichi0629-ai/google-booking-automation) | Googleフォームの予約回答をもとに、カレンダーへの予定登録・予約完了メール送信・処理結果の記録を自動化します。 |
 
-## 注意事項
+## 補助作品・学習作品
 
-`.env`・`credentials.json`・`token.pickle`などの認証情報ファイルには機密情報が含まれるため、リポジトリには含まれていません。各自で取得・設定してください。
+| 作品 | 内容 |
+|---|---|
+| [日程調整支援ツール](https://github.com/moedaichi0629-ai/schedule-adjustment-tool) | 個人開発 |
+| [Todo管理 × Google Sheets × LINE通知](https://github.com/moedaichi0629-ai/todo-app) | 個人開発 |
+| [LINE食事記録Bot](https://github.com/moedaichi0629-ai/meal_management_tool) | 個人開発 |
+| [ライブ思い出アルバムLINE Bot](https://github.com/moedaichi0629-ai/live_album_tool) | 個人開発 |
+| [伝わる文章添削ツール](https://github.com/moedaichi0629-ai/writing-correction-tool) | 個人開発 |
+| [SNS投稿文生成ツール](https://github.com/moedaichi0629-ai/sns-post-generator) | 個人開発 |
+| [クラウドワークス案件マッチャー](https://github.com/moedaichi0629-ai/crowdworks-matcher) | 個人開発 |
+| [LINE × Dify AIチャットボット](https://github.com/moedaichi0629-ai/line-dify-bot) | 学習作品 |
+| [天気予報API連携Webアプリ](https://github.com/moedaichi0629-ai/weather-forecast-app) | 学習作品 |
+| [ブラウザ保存型ToDoリスト](https://github.com/moedaichi0629-ai/todo-list-app) | 学習作品 |
 
-このリポジトリに含まれる一部のツール（文章校正ツール・歌舞伎予習チャットボット・LINE×Difyチャットボット・Todoリスト2種・天気予報アプリ）は、それぞれ独立したGitHubリポジトリとして管理しており、フォルダとしてはローカルに存在しますがこのリポジトリの管理対象外です（`.gitignore`で除外）。
+## このリポジトリの位置づけ
 
-## ライセンス
+作品の案内用です。旧説明にあった「HPたたき台生成」は現在の店舗管理ツールでは廃止されています。最新仕様はリンク先のREADMEを参照してください。
 
-MIT
+認証情報・APIキーは各作品の環境で設定し、公開リポジトリへ含めない運用としています。
+
