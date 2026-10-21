@@ -1,0 +1,7 @@
+{
+  "timezone": "Asia/Tokyo",
+  "accounts": ["main", "sub"],
+  "slots": ["07:00", "12:15", "21:00"],
+  "max_per_day": 5,
+  "slot_window_minutes": 60
+}
