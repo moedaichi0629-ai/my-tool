@@ -1,0 +1,15 @@
+# 秘密情報（アクセストークン・APIキー）
+.env
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# 書き込み途中の一時ファイル
+data/*.tmp
+
+# OS・エディタ
+.DS_Store
+Thumbs.db
